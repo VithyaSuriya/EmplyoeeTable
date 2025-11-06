@@ -1,0 +1,15 @@
+[
+  { "id": 1, "name": "Guru", "department": "Engineering", "status": "Active" },
+  { "id": 2, "name": "Priya", "department": "Design", "status": "Inactive" },
+  { "id": 3, "name": "Vithya", "department": "HR", "status": "Active" },
+  { "id": 4, "name": "Arun", "department": "Engineering", "status": "Active" },
+  { "id": 5, "name": "Divya", "department": "Design", "status": "Inactive" },
+  { "id": 6, "name": "Karthik", "department": "Engineering", "status": "Active" },
+   { "id": 7, "name": "Guru", "department": "Engineering", "status": "Active" },
+  { "id": 8, "name": "Priya", "department": "Design", "status": "Inactive" },
+  { "id": 9, "name": "Vithya", "department": "HR", "status": "Active" },
+  { "id": 10, "name": "Arun", "department": "Engineering", "status": "Active" },
+  { "id": 11, "name": "Divya", "department": "Design", "status": "Inactive" },
+  { "id": 12, "name": "Karthik", "department": "Engineering", "status": "Active" }
+]
+
