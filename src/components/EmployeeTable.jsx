@@ -85,7 +85,7 @@ const EmployeeTable = () => {
         </div>
       </header>
 
-      <section className="flex flex-wrap items-center gap-4 px-8 py-4 bg-white border-b border-gray-200">
+      <div className="flex flex-wrap items-center gap-4 px-8 py-4 bg-white border-b border-gray-200">
         <FilterBar
           filters={filters}
           onSearch={handleSearch}
@@ -94,7 +94,7 @@ const EmployeeTable = () => {
           departmentOptions={departmentOptions}
           statusOptions={statusOptions}
         />
-      </section>
+      </div>
 
       <main className="flex-grow px-8 py-6">
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-x-auto">
