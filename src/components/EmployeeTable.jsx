@@ -7,6 +7,8 @@ import PaginationControls from "./PaginationControls";
 import CommonTable from "./common/CommonTable";
 import CommonLoader from "./common/CommonLoader";
 import CommonError from "./common/CommonError";
+import CommonInput from "./common/CommonInput";
+import CommonButton from "./common/CommonButton";
 
 const EmployeeTable = () => {
   const dispatch = useDispatch();
@@ -48,7 +50,7 @@ const EmployeeTable = () => {
     });
   }, [list, filters]);
 
-  const { page: currentPage = 1, itemsPerPage = 5 } = pagination;
+  const { page: currentPage = 1, itemsPerPage = 10 } = pagination;
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedData = filteredEmployees.slice(
     startIndex,
@@ -68,28 +70,34 @@ const EmployeeTable = () => {
     dispatch(setPagination({ ...pagination, itemsPerPage, page: 1 }));
 
   return (
-    <div className="min-h-screen bg-gray-100 flex justify-center items-start py-12 px-6">
-      <div className="w-full max-w-6xl bg-white rounded-2xl shadow-xl p-10">
-        <div className="text-center mb-10">
-          <h1 className="text-3xl font-bold text-gray-800 ">
-            Manage Employee List with Redux & API Integration
-          </h1>
-        </div>
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <header className="flex flex-col md:flex-row justify-between items-center gap-4 px-8 py-6 bg-white border-b border-gray-200 shadow-sm">
+        <h1 className="text-2xl font-semibold text-gray-800 tracking-tight">
+          Manage Employee List with Redux & API Integration
+        </h1>
 
-        <div className="flex justify-center mb-8">
-          <div className="flex flex-wrap justify-center items-center gap-4 w-full max-w-3xl bg-gray-50 rounded-xl px-6 py-5 shadow-sm">
-            <FilterBar
-              filters={filters}
-              onSearch={handleSearch}
-              onDepartment={handleDepartment}
-              onStatus={handleStatus}
-              departmentOptions={departmentOptions}
-              statusOptions={statusOptions}
-            />
-          </div>
+        <div className="flex items-center gap-4">
+          <CommonButton
+            label="+ Add Employee"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg"
+            onClick={() => alert("Add Employee feature coming soon!")}
+          />
         </div>
+      </header>
 
-        <div className="w-full bg-white rounded-xl shadow-md p-6">
+      <section className="flex flex-wrap items-center gap-4 px-8 py-4 bg-white border-b border-gray-200">
+        <FilterBar
+          filters={filters}
+          onSearch={handleSearch}
+          onDepartment={handleDepartment}
+          onStatus={handleStatus}
+          departmentOptions={departmentOptions}
+          statusOptions={statusOptions}
+        />
+      </section>
+
+      <main className="flex-grow px-8 py-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-x-auto">
           {loading && <CommonLoader message="Fetching employees..." />}
           {error && <CommonError message={error} />}
 
@@ -105,7 +113,7 @@ const EmployeeTable = () => {
                 data={paginatedData}
               />
 
-              <div className="mt-6">
+              <div className="p-4 border-t border-gray-200 bg-gray-50">
                 <PaginationControls
                   currentPage={currentPage}
                   totalItems={filteredEmployees.length}
@@ -117,7 +125,7 @@ const EmployeeTable = () => {
             </>
           )}
         </div>
-      </div>
+      </main>
     </div>
   );
 };
