@@ -1,20 +1,21 @@
 import React, { useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchEmployees } from "../employees/employeeThunks";
 import { setFilters, setPagination } from "../employees/employeeSlice";
 import FilterBar from "./FilterBar";
 import PaginationControls from "./PaginationControls";
 import CommonTable from "./common/CommonTable";
 import CommonLoader from "./common/CommonLoader";
 import CommonError from "./common/CommonError";
-import CommonInput from "./common/CommonInput";
 import CommonButton from "./common/CommonButton";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const EmployeeTable = () => {
   const dispatch = useDispatch();
-  const { list, filters, pagination, loading, error } = useSelector(
-    (state) => state.employees
-  );
+  const { filters, pagination } = useSelector((state) => state.employees);
+  useEffect(() => {
+    dispatch(setFilters({ search: "", department: "", status: "" }));
+    dispatch(setPagination({ page: 1, itemsPerPage: 5 }));
+  }, [dispatch]);
 
   const departmentOptions = [
     { value: "", label: "All Departments" },
@@ -29,17 +30,35 @@ const EmployeeTable = () => {
     { value: "Inactive", label: "Inactive" },
   ];
 
-  useEffect(() => {
-    dispatch(setFilters({ search: "", department: "", status: "" }));
-    dispatch(setPagination({ page: 1, itemsPerPage: 5 }));
-  }, [dispatch]);
+  const queryClient = useQueryClient();
+  const addEmployee = useMutation({
+    mutationFn: async (newEmployee) => {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      console.log("Added employee:", newEmployee);
+      return newEmployee;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["employees"]);
+      alert("Employee added successfully");
+    },
+    onError: (error) => {
+      alert(`Error:${error.message}`);
+    },
+  });
 
-  useEffect(() => {
-    dispatch(fetchEmployees());
-  }, [dispatch, filters, pagination]);
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["employees"],
+    queryFn: async () => {
+      const response = await fetch("/employees.json");
+      if (!response.ok) throw new Error("Failed to fetch employees");
+      await new Promise((resolve) => setTimeout(resolve, 800));
+      return response.json();
+    },
+  });
 
   const filteredEmployees = useMemo(() => {
-    return list.filter((emp) => {
+    if (!data) return [];
+    return data.filter((emp) => {
       const searchMatch = emp.name
         ?.toLowerCase()
         .includes(filters.search.toLowerCase());
@@ -48,7 +67,7 @@ const EmployeeTable = () => {
       const statusMatch = !filters.status || emp.status === filters.status;
       return searchMatch && departmentMatch && statusMatch;
     });
-  }, [list, filters]);
+  }, [data, filters]);
 
   const { page: currentPage = 1, itemsPerPage = 10 } = pagination;
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -75,12 +94,17 @@ const EmployeeTable = () => {
         <h1 className="text-2xl font-semibold text-gray-800 tracking-tight">
           Manage Employee List with Redux & API Integration
         </h1>
-
         <div className="flex items-center gap-4">
           <CommonButton
             label="+ Add Employee"
             className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg"
-            onClick={() => alert("Add Employee feature coming soon!")}
+            onClick={() =>
+              addEmployee.mutate({
+                name: "New Employee",
+                department: "Engineering",
+                status: "Active",
+              })
+            }
           />
         </div>
       </header>
@@ -98,10 +122,10 @@ const EmployeeTable = () => {
 
       <main className="flex-grow px-8 py-6">
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-x-auto">
-          {loading && <CommonLoader message="Fetching employees..." />}
-          {error && <CommonError message={error} />}
+          {isLoading && <CommonLoader message="Fetching employees..." />}
+          {error && <CommonError message={error.message} />}
 
-          {!loading && !error && (
+          {!isLoading && !error && (
             <>
               <CommonTable
                 columns={[
@@ -112,7 +136,6 @@ const EmployeeTable = () => {
                 ]}
                 data={paginatedData}
               />
-
               <div className="p-4 border-t border-gray-200 bg-gray-50">
                 <PaginationControls
                   currentPage={currentPage}
